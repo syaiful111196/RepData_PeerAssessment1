@@ -23,11 +23,41 @@ activitydata <- data.table::fread(input = "activity.csv")
 ```
 
 ## What is mean total number of steps taken per day?
+* number of steps taken per day
+
+```{r}
+Total_Steps <- activitydata[, c(lapply(.SD, sum, na.rm = FALSE)), .SDcols = c("steps"), by = .(date)] 
+head(Total_Steps, 10)
+```
+* Histogram of the total number of steps taken each day 
+
+```{r}
+ggplot(Total_Steps, aes(x = steps)) +
+    geom_histogram(binwidth = 1000) +
+    labs(title = "Daily Steps", x = "Steps", y = "Frequency")+
+  theme_classic()
+```
 
 
+* mean and median of steps taken per day
+```{r}
+Total_Steps[, .(Mean_Steps = mean(steps, na.rm = TRUE), Median_Steps = median(steps, na.rm = TRUE))]
+```
 
 ## What is the average daily activity pattern?
+* Time series plot of the average number of steps taken
 
+```{r}
+IntervalDT <- activitydata[, c(lapply(.SD, mean, na.rm = TRUE)), .SDcols = c("steps"), by = .(interval)] 
+ggplot(IntervalDT, aes(x = interval , y = steps)) + geom_line(color="black", size=1) + labs(title = "Average Daily Steps", x = "Interval", y = "Avg. Steps per day") + theme_classic()
+```
+
+
+* The 5-minute interval that, on average, contains the maximum number of steps
+
+```{r}
+IntervalDT[steps == max(steps), .(max_interval = interval)]
+```
 
 
 ## Imputing missing values
